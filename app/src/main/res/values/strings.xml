@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Object Detection App</string>
+    <string name="welcome_message">Welcome to Object Detection App</string>
+    <string name="instructionMessage">Please select image</string>
+</resources>
