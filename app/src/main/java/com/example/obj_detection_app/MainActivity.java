@@ -1,7 +1,12 @@
 package com.example.obj_detection_app;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,6 +15,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -39,22 +45,33 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initID();
+        initAction();
+
+
+    }
+    private void initID() {
         captureBtn = findViewById(R.id.capture_btn);
         inputImgView = findViewById(R.id.imageViewID);
         imgSample1 = findViewById(R.id.sampleImg1);
         imgSample2 = findViewById(R.id.sampleImg2);
         imgSample3 = findViewById(R.id.sampleImg3);
         tvPlaceHolder = findViewById(R.id.textViewPlaceHolder);
-
+    }
+    private void initAction() {
+        captureBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { dispatchTakePicIntent(); }
+        });
         imgSample1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 try {
+                try {
                     setViewAndDetect(getSampleImage(R.drawable.android_bigbox_case));
-                 }
-                 catch (IOException e){
-                     e.printStackTrace();
-                 }
+                }
+                catch (IOException e){
+                    e.printStackTrace();
+                }
             }
         });
         imgSample2.setOnClickListener(new View.OnClickListener() {
@@ -79,6 +96,34 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    ActivityResultLauncher<Intent> startForResult = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result != null && result.getResultCode() == RESULT_OK) {
+                        Bundle extras = result.getData().getExtras();
+                        Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+                        try {
+                            runObjectDetection(imageBitmap);
+                            // Display captured image
+//                            inputImgView.setImageBitmap(imageBitmap);
+                            tvPlaceHolder.setVisibility(View.VISIBLE);
+                        }
+                        catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+    );
+
+    private void dispatchTakePicIntent() {
+        Intent takePicIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startForResult.launch(takePicIntent);
     }
 
     private Bitmap getSampleImage(int resId) {
