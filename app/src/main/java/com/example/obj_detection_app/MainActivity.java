@@ -21,7 +21,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.obj_detection_app.ml.AndroidFigurine;
+//import com.example.obj_detection_app.ml.AndroidFigurine;
 
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.label.Category;
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    setViewAndDetect(getSampleImage(R.drawable.two_androids));
+                    setViewAndDetect(getSampleImage(R.drawable.kite));
                 }
                 catch (IOException e){
                     e.printStackTrace();
